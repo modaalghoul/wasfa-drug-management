@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Equations" %}{% endblock %}
+{% block content %}
+<div class="container-fluid"><div class="page-header"><div class="container-fluid d-flex justify-content-between"><div><h1><i class="bi bi-function"></i> {% trans "Medical Equations" %}</h1></div><a href="{% url 'equation_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> {% trans "Add New" %}</a></div></div>
+<div class="container-fluid">{% if equations %}<div class="row">{% for eq in equations %}<div class="col-lg-4 col-md-6 mb-4"><div class="card h-100"><div class="card-body"><h5>{{ eq.name_ar|default:eq.name }}</h5><p class="text-muted small">{{ eq.description_ar|default:eq.description|truncatewords:10 }}</p><p><small><strong>{% trans "Result:" %}</strong> {{ eq.result_label }}</small></p></div><div class="card-footer bg-light"><a href="{% url 'equation_edit' eq.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a><a href="{% url 'equation_delete' eq.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a></div></div></div>{% endfor %}</div>{% else %}<div class="alert alert-info">{% trans "No equations yet." %}</div>{% endif %}</div></div>
+{% endblock %}

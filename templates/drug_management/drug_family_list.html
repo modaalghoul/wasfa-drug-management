@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Drug Families" %} — Wasfa{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1><i class="bi bi-diagram-3 text-primary me-2"></i>{% trans "Drug Families" %}</h1>
+    </div>
+    <a href="{% url 'drug_family_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>{% trans "Add New" %}
+    </a>
+</div>
+
+{% if families %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>{% trans "English Name" %}</th>
+                        <th>{% trans "Arabic Name" %}</th>
+                        <th>{% trans "Category" %}</th>
+                        <th style="width:120px">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for fam in families %}
+                    <tr>
+                        <td><strong>{{ fam.name }}</strong></td>
+                        <td>
+                            {% if fam.name_ar %}
+                                <span class="arabic-field" style="font-family:'Cairo',sans-serif; font-size:0.95rem;">{{ fam.name_ar }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if fam.drug_category %}
+                                <span class="fw-semibold">{{ fam.drug_category.name }}</span>
+                                {% if fam.drug_category.name_ar %}
+                                    <br><small class="text-muted" style="font-family:'Cairo',sans-serif;">{{ fam.drug_category.name_ar }}</small>
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'drug_family_edit' fam.pk %}" class="btn btn-sm btn-warning" title="{% trans 'Edit' %}"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'drug_family_delete' fam.pk %}" class="btn btn-sm btn-danger" title="{% trans 'Delete' %}"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div class="alert alert-info">{% trans "No families yet." %} <a href="{% url 'drug_family_create' %}">{% trans "Add one now" %}</a>.</div>
+{% endif %}
+{% endblock %}

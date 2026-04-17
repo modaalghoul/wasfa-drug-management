@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Edit Trade Name" %}{% else %}{% trans "Add Trade Name" %}{% endif %} — Wasfa{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1>
+            <i class="bi bi-box-seam text-primary me-2"></i>
+            {% if object %}{% trans "Edit Trade Name" %}{% else %}{% trans "Add Trade Name Product" %}{% endif %}
+        </h1>
+        <p class="page-subtitle">{% if object %}{{ object.trade_name }}{% else %}{% trans "Brand / commercial product" %}{% endif %}</p>
+    </div>
+    <a href="{% url 'trade_name_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>{% trans "Back to List" %}
+    </a>
+</div>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-0">
+        <div class="card-header bg-white pb-0 pt-3 px-4">
+            <ul class="nav nav-tabs">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-basic" type="button"><i class="bi bi-tag me-1"></i>{% trans "Basic" %}</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pricing" type="button"><i class="bi bi-currency-dollar me-1"></i>{% trans "Pricing" %}</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-physical" type="button"><i class="bi bi-boxes me-1"></i>{% trans "Physical" %}</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-notes" type="button"><i class="bi bi-sticky me-1"></i>{% trans "Notes" %}</button></li>
+            </ul>
+        </div>
+        <div class="card-body px-4">
+            <div class="tab-content">
+
+                <!-- Tab 1: Basic -->
+                <div class="tab-pane fade show active pt-4" id="tab-basic">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Trade Name (English)" %} <span class="text-danger">*</span></label>
+                            {{ form.trade_name }}
+                            {% if form.trade_name.errors %}<div class="invalid-feedback d-block">{{ form.trade_name.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><span class="field-ar-indicator">ع</span> {% trans "Trade Name (Arabic)" %}</label>
+                            {{ form.trade_name_ar }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Drug Form" %}</label>
+                            {{ form.drug_form }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Concentration" %}</label>
+                            {{ form.concentration }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Manufacturer" %}</label>
+                            {{ form.manufacturer }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Drug Category" %}</label>
+                            {{ form.drug_category }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Drug Family" %}</label>
+                            {{ form.drug_family }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Patient Group" %}</label>
+                            {{ form.patient_group }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Pricing -->
+                <div class="tab-pane fade pt-4" id="tab-pricing">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Prescription Status" %}</label>
+                            {{ form.prescription_status }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Availability" %}</label>
+                            {{ form.availability }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Package Size" %}</label>
+                            {{ form.package_size }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Price" %}</label>
+                            {{ form.price }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Price with Tax" %}</label>
+                            {{ form.price_with_tax }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Barcode" %}</label>
+                            {{ form.barcode }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{% trans "Prescription Notes" %}</label>
+                            {{ form.prescription_status_notes }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Physical & Storage -->
+                <div class="tab-pane fade pt-4" id="tab-physical">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <p class="section-divider">{% trans "Physical Modification" %}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                {{ form.can_be_crushed }}
+                                <label class="form-check-label fw-semibold">{% trans "Can be Crushed" %}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                {{ form.can_be_cut }}
+                                <label class="form-check-label fw-semibold">{% trans "Can be Cut" %}</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                {{ form.can_be_chewed }}
+                                <label class="form-check-label fw-semibold">{% trans "Can be Chewed" %}</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{% trans "Physical Modification Notes" %}</label>
+                            {{ form.physical_modification_notes }}
+                        </div>
+                        <div class="col-12">
+                            <p class="section-divider">{% trans "Storage" %}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Storage Conditions" %}</label>
+                            {{ form.storage_conditions }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{% trans "Shelf Life" %}</label>
+                            {{ form.shelf_life }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{% trans "Storage After Opening" %}</label>
+                            {{ form.storage_after_opening }}
+                        </div>
+                        <div class="col-12">
+                            <p class="section-divider">{% trans "Images" %}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Package Image URL" %}</label>
+                            {{ form.package_image_url }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Leaflet Image URL" %}</label>
+                            {{ form.leaflet_image_url }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Box Image URL" %}</label>
+                            {{ form.box_image_url }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 4: Notes -->
+                <div class="tab-pane fade pt-4" id="tab-notes">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "General Notes" %}</label>
+                            {{ form.notes }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Pharmacist Notes" %}</label>
+                            {{ form.pharmacist_notes }}
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                {{ form.show_estimated_weight }}
+                                <label class="form-check-label fw-semibold">{% trans "Show Estimated Weight" %}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sticky-save-bar">
+            <a href="{% url 'trade_name_list' %}" class="btn btn-outline-secondary"><i class="bi bi-x me-1"></i>{% trans "Cancel" %}</a>
+            <button type="submit" class="btn btn-primary px-5"><i class="bi bi-check-circle me-2"></i>{% trans "Save" %}</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

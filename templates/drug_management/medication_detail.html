@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ medication.generic_name_ar|default:medication.generic_name }} - Drug Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div>
+                <h1>
+                    <i class="bi bi-prescription2"></i> 
+                    {{ medication.generic_name_ar|default:medication.generic_name }}
+                </h1>
+                {% if medication.generic_name != medication.generic_name_ar %}
+                    <small class="text-muted">{{ medication.generic_name }}</small>
+                {% endif %}
+            </div>
+            <div>
+                <a href="{% url 'medication_edit' medication.pk %}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> {% trans "Edit" %}
+                </a>
+                <a href="{% url 'medication_delete' medication.pk %}" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> {% trans "Delete" %}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Basic Info -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle"></i> {% trans "Basic Information" %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">{% trans "Drug Form" %}</h6>
+                                <p>{{ medication.get_drug_form_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">{% trans "Drug Category" %}</h6>
+                                <p>
+                                    {% if medication.drug_category %}
+                                        <a href="{% url 'drug_category_list' %}?category={{ medication.drug_category.id }}">
+                                            {{ medication.drug_category.name_ar|default:medication.drug_category.name }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">{% trans "Drug Family" %}</h6>
+                                <p>
+                                    {% if medication.drug_family %}
+                                        <a href="{% url 'drug_family_list' %}?family={{ medication.drug_family.id }}">
+                                            {{ medication.drug_family.name_ar|default:medication.drug_family.name }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">{% trans "Patient Group" %}</h6>
+                                <p>
+                                    {% if medication.patient_group %}
+                                        {{ medication.patient_group.name_ar|default:medication.patient_group.name }}
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="bi bi-activity"></i> {% trans "Status" %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>
+                            <strong>{% trans "Created:" %}</strong><br>
+                            <small class="text-muted">{{ medication.created_at|date:"SHORT_DATE_FORMAT" }}</small>
+                        </p>
+                        <p>
+                            <strong>{% trans "Last Updated:" %}</strong><br>
+                            <small class="text-muted">{{ medication.updated_at|date:"SHORT_DATE_FORMAT" }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Medical Info -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="bi bi-heart-pulse"></i> {% trans "Medical Information" %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% if medication.indications %}
+                                    <h6>{% trans "Indications" %}</h6>
+                                    <p>{{ medication.indications|linebreaks }}</p>
+                                {% endif %}
+                                
+                                {% if medication.contraindications %}
+                                    <h6>{% trans "Contraindications" %}</h6>
+                                    <p>{{ medication.contraindications|linebreaks }}</p>
+                                {% endif %}
+                               
+                                {% if medication.side_effects %}
+                                    <h6>{% trans "Side Effects" %}</h6>
+                                    <p>{{ medication.side_effects|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {% if medication.warnings %}
+                                    <h6>{% trans "Warnings" %}</h6>
+                                    <p>{{ medication.warnings|linebreaks }}</p>
+                                {% endif %}
+                                
+                                {% if medication.precautions %}
+                                    <h6>{% trans "Precautions" %}</h6>
+                                    <p>{{ medication.precautions|linebreaks }}</p>
+                                {% endif %}
+                                
+                                {% if medication.overdose_management %}
+                                    <h6>{% trans "Overdose Management" %}</h6>
+                                    <p>{{ medication.overdose_management|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pregnancy & Lactation -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">
+                            <i class="bi bi-heart"></i> {% trans "Pregnancy & Lactation" %}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>{% trans "Pregnancy Category" %}</h6>
+                                <p>
+                                    {% if medication.pregnancy_category %}
+                                        <span class="badge bg-warning">{{ medication.get_pregnancy_category_display }}</span>
+                                    {% else %}
+                                        <span class="text-muted">—</span>
+                                    {% endif %}
+                                </p>
+                                {% if medication.pregnancy_safety %}
+                                    <h6>{% trans "Pregnancy Safety" %}</h6>
+                                    <p>{{ medication.pregnancy_safety|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h6>{% trans "Breastfeeding" %}</h6>
+                                <p>
+                                    {% if medication.breastfeeding_compatible is None %}
+                                        <span class="badge bg-secondary">{% trans "Unknown" %}</span>
+                                    {% elif medication.breastfeeding_compatible %}
+                                        <span class="badge bg-success">{% trans "Compatible" %}</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">{% trans "Not Compatible" %}</span>
+                                    {% endif %}
+                                </p>
+                                {% if medication.lactation_safety %}
+                                    <h6>{% trans "Lactation Safety" %}</h6>
+                                    <p>{{ medication.lactation_safety|linebreaks }}</p>
+                                {% endif %}
+                                {% if medication.breastfeeding_notes %}
+                                    <h6>{% trans "Notes" %}</h6>
+                                    <p>{{ medication.breastfeeding_notes|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dosage Rules -->
+        {% if dosage_rules %}
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-light d-flex justify-content-between">
+                        <h5 class="mb-0">
+                            <i class="bi bi-calculator"></i> {% trans "Dosage Rules" %}
+                        </h5>
+                        <a href="{% url 'dosage_rule_create' %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> {% trans "Add Rule" %}
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{% trans "Label" %}</th>
+                                        <th>{% trans "Patient Group" %}</th>
+                                        <th>{% trans "Route" %}</th>
+                                        <th>{% trans "Frequency" %}</th>
+                                        <th>{% trans "Actions" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for rule in dosage_rules %}
+                                    <tr>
+                                        <td><strong>{{ rule.label }}</strong></td>
+                                        <td>
+                                            {% if rule.patient_group %}
+                                                {{ rule.patient_group.name_ar|default:rule.patient_group.name }}
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ rule.get_route_display }}</td>
+                                        <td>{{ rule.frequency_text|default:rule.frequency_per_day }}</td>
+                                        <td>
+                                            <a href="{% url 'dosage_rule_edit' rule.pk %}" class="btn btn-sm btn-warning">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'dosage_rule_delete' rule.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Drug Interactions -->
+        {% if interactions %}
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header bg-light d-flex justify-content-between">
+                        <h5 class="mb-0">
+                            <i class="bi bi-exclamation-triangle"></i> {% trans "Drug Interactions" %}
+                        </h5>
+                        <a href="{% url 'drug_interaction_create' %}" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i> {% trans "Add Interaction" %}
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{% trans "Drug A" %}</th>
+                                        <th>{% trans "Drug B" %}</th>
+                                        <th>{% trans "Severity" %}</th>
+                                        <th>{% trans "Description" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for inter in interactions %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'medication_detail' inter.drug_a.pk %}">
+                                                {{ inter.drug_a.generic_name_ar|default:inter.drug_a.generic_name }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'medication_detail' inter.drug_b.pk %}">
+                                                {{ inter.drug_b.generic_name_ar|default:inter.drug_b.generic_name }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if inter.severity == 'severe' or inter.severity == 'contraindicated' %}danger{% elif inter.severity == 'moderate' %}warning{% else %}info{% endif %}">
+                                                {{ inter.get_severity_display }}
+                                            </span>
+                                        </td>
+                                        <td><small>{{ inter.description|truncatewords:10 }}</small></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,522 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if object %}{% trans "Edit Medication" %}{% else %}{% trans "Add Medication" %}{% endif %} — Wasfa{% endblock %}
+
+{% block extra_css %}
+<style>
+.tab-pane { padding-top: 24px; }
+.required-star { color: #e53e3e; }
+.dosage-rule-item.deleted { opacity: 0.4; pointer-events: none; }
+.add-rule-btn {
+    border: 2px dashed #667eea;
+    color: #667eea;
+    background: #f8f9ff;
+    border-radius: 10px;
+    padding: 12px;
+    width: 100%;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.add-rule-btn:hover { background: #eef0ff; border-color: #5568d3; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1>
+            {% if object %}
+                <i class="bi bi-pencil-square text-primary me-2"></i>{% trans "Edit Medication" %}
+            {% else %}
+                <i class="bi bi-plus-circle text-primary me-2"></i>{% trans "Add New Medication" %}
+            {% endif %}
+        </h1>
+        <p class="page-subtitle mb-0">
+            {% if object %}{{ object.generic_name }}{% else %}{% trans "Generic (active ingredient)" %}{% endif %}
+        </p>
+    </div>
+    <a href="{% url 'medication_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>{% trans "Back to List" %}
+    </a>
+</div>
+
+<form method="post" id="medicationForm" novalidate>
+    {% csrf_token %}
+
+    <!-- ── Tab Nav ────────────────────────────────────────── -->
+    <div class="card mb-0">
+        <div class="card-header bg-white pb-0 pt-3 px-4">
+            <ul class="nav nav-tabs" id="medTabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-basic" type="button">
+                        <i class="bi bi-info-circle me-1"></i>{% trans "Basic Info" %}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-medical" type="button">
+                        <i class="bi bi-heart-pulse me-1"></i>{% trans "Medical" %}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pregnancy" type="button">
+                        <i class="bi bi-gender-female me-1"></i>{% trans "Pregnancy" %}
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-dosage" type="button" id="dosageTabBtn">
+                        <i class="bi bi-calculator me-1"></i>{% trans "Dosage Rules" %}
+                        <span class="tab-count" id="dosageCount">{{ dosage_formset.total_form_count }}</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-notes" type="button">
+                        <i class="bi bi-sticky me-1"></i>{% trans "Notes" %}
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="card-body px-4">
+            <div class="tab-content" id="medTabsContent">
+
+                <!-- ── Tab 1: Basic Info ─────────────────────────── -->
+                <div class="tab-pane fade show active" id="tab-basic" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Generic Name (English)" %} <span class="required-star">*</span></label>
+                            {{ form.generic_name }}
+                            {% if form.generic_name.errors %}<div class="invalid-feedback d-block">{{ form.generic_name.errors }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                <span class="field-ar-indicator">ع</span>
+                                {% trans "Generic Name (Arabic)" %}
+                            </label>
+                            {{ form.generic_name_ar }}
+                            {% if form.generic_name_ar.errors %}<div class="invalid-feedback d-block">{{ form.generic_name_ar.errors }}</div>{% endif %}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Drug Form" %}</label>
+                            {{ form.drug_form }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Drug Category" %}</label>
+                            {{ form.drug_category }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Drug Family" %}</label>
+                            {{ form.drug_family }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Patient Group" %}</label>
+                            {{ form.patient_group }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">{% trans "Display Order" %}</label>
+                            {{ form.display_order_in_family }}
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check mb-2">
+                                {{ form.show_estimated_weight }}
+                                <label class="form-check-label fw-semibold">{% trans "Show Weight Table" %}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Tab 2: Medical Info ───────────────────────── -->
+                <div class="tab-pane fade" id="tab-medical" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">{% trans "Indications" %}</label>
+                            {{ form.indications }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{% trans "Contraindications" %}</label>
+                            {{ form.contraindications }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Side Effects" %}</label>
+                            {{ form.side_effects }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Warnings" %}</label>
+                            {{ form.warnings }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Precautions" %}</label>
+                            {{ form.precautions }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Overdose Management" %}</label>
+                            {{ form.overdose_management }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Tab 3: Pregnancy & Lactation ─────────────── -->
+                <div class="tab-pane fade" id="tab-pregnancy" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{% trans "Pregnancy Category" %}</label>
+                            {{ form.pregnancy_category }}
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <div class="form-check mb-2">
+                                {{ form.breastfeeding_compatible }}
+                                <label class="form-check-label fw-semibold">{% trans "Breastfeeding Compatible" %}</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">{% trans "Pregnancy Safety Notes" %}</label>
+                            {{ form.pregnancy_safety }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Lactation Safety" %}</label>
+                            {{ form.lactation_safety }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Breastfeeding Notes" %}</label>
+                            {{ form.breastfeeding_notes }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Tab 4: Dosage Rules (inline formset) ──────── -->
+                <div class="tab-pane fade" id="tab-dosage" role="tabpanel">
+                    {{ dosage_formset.management_form }}
+
+                    <div id="dosage-rules-container">
+                        {% for rule_form in dosage_formset %}
+                        <div class="dosage-rule-item card mb-3" data-index="{{ forloop.counter0 }}">
+                            <div class="rule-header">
+                                <div>
+                                    <span class="rule-number">{{ forloop.counter }}</span>
+                                    <span class="fw-semibold text-primary">{% trans "Dosage Rule" %} #{{ forloop.counter }}</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if rule_form.instance.pk %}
+                                        <span class="badge bg-success-subtle text-success">{% trans "Saved" %}</span>
+                                    {% endif %}
+                                    <button type="button" class="btn btn-sm btn-outline-danger remove-rule-btn" title="{% trans 'Remove' %}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="rule-body">
+                                {% for hidden in rule_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Label" %}</label>
+                                        {{ rule_form.label }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Patient Group" %}</label>
+                                        {{ rule_form.patient_group }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Indication" %}</label>
+                                        {{ rule_form.indication }}
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Calc Type" %}</label>
+                                        {{ rule_form.dose_calc_type }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Route" %}</label>
+                                        {{ rule_form.route }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Formula Type" %}</label>
+                                        {{ rule_form.formula_type }}
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">{% trans "Factor" %}</label>
+                                        {{ rule_form.formula_factor }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">{% trans "Divisor" %}</label>
+                                        {{ rule_form.formula_divisor }}
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Min Dose (mg)" %}</label>
+                                        {{ rule_form.min_dose_mg }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Max Dose (mg)" %}</label>
+                                        {{ rule_form.max_dose_mg }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Max Daily (mg)" %}</label>
+                                        {{ rule_form.max_daily_dose_mg }}
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Freq. / Day" %}</label>
+                                        {{ rule_form.frequency_per_day }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Frequency Text" %}</label>
+                                        {{ rule_form.frequency_text }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Duration" %}</label>
+                                        {{ rule_form.duration_text }}
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">{% trans "Usual Dose Text (Adults)" %}</label>
+                                        {{ rule_form.usual_dose_text }}
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Min Age (months)" %}</label>
+                                        {{ rule_form.min_age_months }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Max Age (months)" %}</label>
+                                        {{ rule_form.max_age_months }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Min Weight (kg)" %}</label>
+                                        {{ rule_form.min_weight_kg }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Max Weight (kg)" %}</label>
+                                        {{ rule_form.max_weight_kg }}
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="form-label">{% trans "Notes" %}</label>
+                                        {{ rule_form.notes }}
+                                    </div>
+                                </div>
+
+                                <!-- DELETE checkbox (hidden, triggered by remove btn) -->
+                                <div style="display:none">{{ rule_form.DELETE }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Empty form template for JS cloning -->
+                    <div id="empty-dosage-rule" style="display:none">
+                        <div class="dosage-rule-item card mb-3" data-index="__prefix__">
+                            <div class="rule-header">
+                                <div>
+                                    <span class="rule-number new-rule-number">?</span>
+                                    <span class="fw-semibold text-primary">{% trans "New Dosage Rule" %}</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-rule-btn">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            <div class="rule-body">
+                                {% with rule_form=dosage_formset.empty_form %}
+                                {% for hidden in rule_form.hidden_fields %}{{ hidden }}{% endfor %}
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Label" %}</label>
+                                        {{ rule_form.label }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Patient Group" %}</label>
+                                        {{ rule_form.patient_group }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Indication" %}</label>
+                                        {{ rule_form.indication }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Calc Type" %}</label>
+                                        {{ rule_form.dose_calc_type }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Route" %}</label>
+                                        {{ rule_form.route }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Formula Type" %}</label>
+                                        {{ rule_form.formula_type }}
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">{% trans "Factor" %}</label>
+                                        {{ rule_form.formula_factor }}
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">{% trans "Divisor" %}</label>
+                                        {{ rule_form.formula_divisor }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Min Dose (mg)" %}</label>
+                                        {{ rule_form.min_dose_mg }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Max Dose (mg)" %}</label>
+                                        {{ rule_form.max_dose_mg }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Max Daily (mg)" %}</label>
+                                        {{ rule_form.max_daily_dose_mg }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Freq. / Day" %}</label>
+                                        {{ rule_form.frequency_per_day }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Frequency Text" %}</label>
+                                        {{ rule_form.frequency_text }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{% trans "Duration" %}</label>
+                                        {{ rule_form.duration_text }}
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">{% trans "Usual Dose Text (Adults)" %}</label>
+                                        {{ rule_form.usual_dose_text }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Min Age (months)" %}</label>
+                                        {{ rule_form.min_age_months }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Max Age (months)" %}</label>
+                                        {{ rule_form.max_age_months }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Min Weight (kg)" %}</label>
+                                        {{ rule_form.min_weight_kg }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">{% trans "Max Weight (kg)" %}</label>
+                                        {{ rule_form.max_weight_kg }}
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">{% trans "Notes" %}</label>
+                                        {{ rule_form.notes }}
+                                    </div>
+                                </div>
+                                <div style="display:none">{{ rule_form.DELETE }}</div>
+                                {% endwith %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="add-rule-btn mt-2" id="addRuleBtn">
+                        <i class="bi bi-plus-circle me-2"></i>{% trans "Add Dosage Rule" %}
+                    </button>
+                </div>
+
+                <!-- ── Tab 5: Notes ──────────────────────────────── -->
+                <div class="tab-pane fade" id="tab-notes" role="tabpanel">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "General Notes" %}</label>
+                            {{ form.notes }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{% trans "Pharmacist Notes" %}</label>
+                            {{ form.pharmacist_notes }}
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /tab-content -->
+        </div>
+
+        <!-- ── Sticky Save Bar ──────────────────────────────── -->
+        <div class="sticky-save-bar">
+            <a href="{% url 'medication_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x me-1"></i>{% trans "Cancel" %}
+            </a>
+            <button type="submit" class="btn btn-primary px-5">
+                <i class="bi bi-check-circle me-2"></i>{% trans "Save Medication" %}
+            </button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(function() {
+    // ── Inline Dosage Rule Formset ─────────────────────────
+    const container   = document.getElementById('dosage-rules-container');
+    const emptyForm   = document.getElementById('empty-dosage-rule').innerHTML;
+    const totalForms  = document.getElementById('id_dosagerule_set-TOTAL_FORMS');
+    const countBadge  = document.getElementById('dosageCount');
+
+    function updateCount() {
+        const visible = container.querySelectorAll('.dosage-rule-item:not(.deleted)').length;
+        countBadge.textContent = visible;
+    }
+
+    // Renumber visible rules
+    function renumber() {
+        let n = 1;
+        container.querySelectorAll('.dosage-rule-item:not(.deleted)').forEach(el => {
+            const num = el.querySelector('.rule-number');
+            if (num) num.textContent = n++;
+        });
+    }
+
+    // Add rule
+    document.getElementById('addRuleBtn').addEventListener('click', function() {
+        const idx     = parseInt(totalForms.value);
+        const html    = emptyForm.replace(/__prefix__/g, idx);
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html;
+        const newItem = wrapper.firstElementChild;
+        newItem.dataset.index = idx;
+        const numSpan = newItem.querySelector('.new-rule-number');
+        if (numSpan) numSpan.textContent = idx + 1;
+        container.appendChild(newItem);
+        totalForms.value = idx + 1;
+        initSelect2(newItem);
+        updateCount();
+        renumber();
+        newItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    // Remove rule (event delegation)
+    container.addEventListener('click', function(e) {
+        const btn = e.target.closest('.remove-rule-btn');
+        if (!btn) return;
+        const item = btn.closest('.dosage-rule-item');
+        const deleteChk = item.querySelector('input[name$="-DELETE"]');
+        if (deleteChk) {
+            // Saved record: mark for deletion
+            deleteChk.checked = true;
+            item.classList.add('deleted');
+        } else {
+            item.remove();
+            totalForms.value = parseInt(totalForms.value) - 1;
+        }
+        updateCount();
+        renumber();
+    });
+
+    updateCount();
+    renumber();
+
+    // ── Tab error highlighting ─────────────────────────────
+    document.querySelectorAll('.invalid-feedback').forEach(el => {
+        const pane = el.closest('.tab-pane');
+        if (!pane) return;
+        const tab = document.querySelector(`[data-bs-target="#${pane.id}"]`);
+        if (tab) tab.classList.add('tab-has-error');
+    });
+
+    // Activate first tab with errors on load
+    const errTab = document.querySelector('.nav-link.tab-has-error');
+    if (errTab) {
+        bootstrap.Tab.getOrCreateInstance(errTab).show();
+    }
+});
+</script>
+{% endblock %}

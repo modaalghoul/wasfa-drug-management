@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Medications" %} — Wasfa{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1><i class="bi bi-capsule text-primary me-2"></i>{% trans "Generic Medications" %}</h1>
+    </div>
+    <a href="{% url 'medication_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>{% trans "Add New Medication" %}
+    </a>
+</div>
+
+<!-- Search & Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" placeholder="{% trans 'Search by name...' %}" value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select">
+                    <option value="">{% trans "All Categories" %}</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.name }}{% if cat.name_ar %} / {{ cat.name_ar }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="family" class="form-select">
+                    <option value="">{% trans "All Families" %}</option>
+                    {% for fam in families %}
+                    <option value="{{ fam.id }}" {% if selected_family == fam.id|stringformat:"s" %}selected{% endif %}>
+                        {{ fam.name }}{% if fam.name_ar %} / {{ fam.name_ar }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>{% trans "Search" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Table -->
+{% if medications %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>{% trans "English Name" %}</th>
+                        <th>{% trans "Arabic Name" %}</th>
+                        <th>{% trans "Category" %}</th>
+                        <th>{% trans "Form" %}</th>
+                        <th>{% trans "Family" %}</th>
+                        <th style="width:130px">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in medications %}
+                    <tr>
+                        <td><strong>{{ med.generic_name }}</strong></td>
+                        <td>
+                            {% if med.generic_name_ar %}
+                                <span style="font-family:'Cairo',sans-serif; font-size:0.95rem;">{{ med.generic_name_ar }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if med.drug_category %}
+                                <span class="badge bg-primary-subtle text-primary">{{ med.drug_category.name }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary-subtle text-secondary">{% trans "N/A" %}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ med.get_drug_form_display|default:"—" }}</td>
+                        <td>
+                            {% if med.drug_family %}
+                                <span class="fw-semibold">{{ med.drug_family.name }}</span>
+                                {% if med.drug_family.name_ar %}
+                                    <br><small class="text-muted" style="font-family:'Cairo',sans-serif;">{{ med.drug_family.name_ar }}</small>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'medication_detail' med.pk %}" class="btn btn-sm btn-info" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'medication_edit' med.pk %}" class="btn btn-sm btn-warning" title="{% trans 'Edit' %}"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'medication_delete' med.pk %}" class="btn btn-sm btn-danger" title="{% trans 'Delete' %}"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<nav class="d-flex justify-content-center mt-4">
+    <ul class="pagination">
+        {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">{% trans "First" %}</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">{% trans "Previous" %}</a></li>
+        {% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+        {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">{% trans "Next" %}</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">{% trans "Last" %}</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+    <div class="alert alert-info">{% trans "No medications found." %} <a href="{% url 'medication_create' %}">{% trans "Add a new one" %}</a>.</div>
+{% endif %}
+{% endblock %}

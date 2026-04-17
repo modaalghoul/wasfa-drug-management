@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% if form.instance.pk %}
+        {% trans "Edit Patient Group" %} - Drug Management System
+    {% else %}
+        {% trans "Add Patient Group" %} - Drug Management System
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1>
+                {% if form.instance.pk %}
+                    <i class="bi bi-pencil"></i> {% trans "Edit Patient Group" %}
+                {% else %}
+                    <i class="bi bi-plus-circle"></i> {% trans "Add Patient Group" %}
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <form method="post" class="card">
+                    {% csrf_token %}
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_name" class="form-label">
+                                    {% trans "Name (English)" %} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_name_ar" class="form-label">
+                                    {% trans "Name (Arabic)" %}
+                                </label>
+                                {{ form.name_ar }}
+                                {% if form.name_ar.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.name_ar.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">
+                                {% trans "Description" %}
+                            </label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="invalid-feedback d-block">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_image_url" class="form-label">
+                                {% trans "Image URL" %}
+                            </label>
+                            {{ form.image_url }}
+                            {% if form.image_url.errors %}
+                                <div class="invalid-feedback d-block">{{ form.image_url.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_display_order" class="form-label">
+                                    {% trans "Display Order" %}
+                                </label>
+                                {{ form.display_order }}
+                                {% if form.display_order.errors %}
+                                    <div class="invalid-feedback d-block">{{ form.display_order.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.requires_weight_input }}
+                                <label for="id_requires_weight_input" class="form-check-label">
+                                    {% trans "Requires Weight Input" %}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.requires_age_input }}
+                                <label for="id_requires_age_input" class="form-check-label">
+                                    {% trans "Requires Age Input" %}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light d-flex justify-content-between">
+                        <a href="{% url 'patient_group_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> {% trans "Cancel" %}
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> {% trans "Save" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

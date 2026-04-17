@@ -1,0 +1,120 @@
+# English translations for Drug Management System
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+"Language-Team: English\n"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Welcome to the Drug Management System"
+msgstr "Welcome to the Drug Management System"
+
+msgid "Generic Medications"
+msgstr "Generic Medications"
+
+msgid "Trade Name Products"
+msgstr "Trade Name Products"
+
+msgid "Drug Categories"
+msgstr "Drug Categories"
+
+msgid "Medical Equations"
+msgstr "Medical Equations"
+
+msgid "Quick Actions"
+msgstr "Quick Actions"
+
+msgid "Add New"
+msgstr "Add New"
+
+msgid "New Medication"
+msgstr "New Medication"
+
+msgid "New Trade Name"
+msgstr "New Trade Name"
+
+msgid "New Dosage Rule"
+msgstr "New Dosage Rule"
+
+msgid "Browse"
+msgstr "Browse"
+
+msgid "All Medications"
+msgstr "All Medications"
+
+msgid "All Trade Names"
+msgstr "All Trade Names"
+
+msgid "All Equations"
+msgstr "All Equations"
+
+msgid "Recent Medications"
+msgstr "Recent Medications"
+
+msgid "View All"
+msgstr "View All"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Form"
+msgstr "Form"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "View"
+msgstr "View"
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "No medications yet. Start by adding a new medication."
+msgstr "No medications yet. Start by adding a new medication."
+
+msgid "Recent Trade Name Products"
+msgstr "Recent Trade Name Products"
+
+msgid "Product Name"
+msgstr "Product Name"
+
+msgid "Manufacturer"
+msgstr "Manufacturer"
+
+msgid "Availability"
+msgstr "Availability"
+
+msgid "No trade name products yet. Start by adding a new product."
+msgstr "No trade name products yet. Start by adding a new product."
+
+msgid "Patient Groups"
+msgstr "Patient Groups"
+
+msgid "Drug Families"
+msgstr "Drug Families"
+
+msgid "Dosage Rules"
+msgstr "Dosage Rules"
+
+msgid "Trade Names"
+msgstr "Trade Names"
+
+msgid "Manufacturers"
+msgstr "Manufacturers"
+
+msgid "Equations"
+msgstr "Equations"
+
+msgid "Age-Weight"
+msgstr "Age-Weight"
+
+msgid "Interactions"
+msgstr "Interactions"
+
+msgid "Drug Management"
+msgstr "Drug Management"

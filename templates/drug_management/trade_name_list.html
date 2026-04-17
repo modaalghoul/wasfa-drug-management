@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Trade Name Products" %} — Wasfa{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1><i class="bi bi-box-seam text-primary me-2"></i>{% trans "Trade Name Products" %}</h1>
+    </div>
+    <a href="{% url 'trade_name_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>{% trans "Add New" %}
+    </a>
+</div>
+
+<!-- Search & Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="{% trans 'Search by trade name...' %}" value="{{ search_query }}">
+            </div>
+            <div class="col-md-4">
+                <select name="category" class="form-select">
+                    <option value="">{% trans "All Categories" %}</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.name }}{% if cat.name_ar %} / {{ cat.name_ar }}{% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search me-1"></i>{% trans "Search" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if products %}
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>{% trans "English Name" %}</th>
+                        <th>{% trans "Arabic Name" %}</th>
+                        <th>{% trans "Manufacturer" %}</th>
+                        <th>{% trans "Form" %}</th>
+                        <th>{% trans "Availability" %}</th>
+                        <th style="width:130px">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for prod in products %}
+                    <tr>
+                        <td><strong>{{ prod.trade_name }}</strong></td>
+                        <td>
+                            {% if prod.trade_name_ar %}
+                                <span style="font-family:'Cairo',sans-serif; font-size:0.95rem;">{{ prod.trade_name_ar }}</span>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if prod.manufacturer %}
+                                <span class="fw-semibold">{{ prod.manufacturer.name }}</span>
+                                {% if prod.manufacturer.name_ar %}
+                                    <br><small class="text-muted" style="font-family:'Cairo',sans-serif;">{{ prod.manufacturer.name_ar }}</small>
+                                {% endif %}
+                            {% else %}—{% endif %}
+                        </td>
+                        <td>{{ prod.get_drug_form_display|default:"—" }}</td>
+                        <td>
+                            <span class="badge bg-{% if prod.availability == 'good' %}success{% elif prod.availability == 'medium' %}warning{% else %}danger{% endif %}-subtle text-{% if prod.availability == 'good' %}success{% elif prod.availability == 'medium' %}warning{% else %}danger{% endif %}">
+                                {{ prod.get_availability_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'trade_name_detail' prod.pk %}" class="btn btn-sm btn-info" title="{% trans 'View' %}"><i class="bi bi-eye"></i></a>
+                            <a href="{% url 'trade_name_edit' prod.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                            <a href="{% url 'trade_name_delete' prod.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+    <div class="alert alert-info">{% trans "No products yet." %} <a href="{% url 'trade_name_create' %}">{% trans "Add one now" %}</a>.</div>
+{% endif %}
+{% endblock %}

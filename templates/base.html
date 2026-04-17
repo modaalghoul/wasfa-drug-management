@@ -1,0 +1,521 @@
+{% load i18n %}
+{% load translation_tags %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_CODE == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Wasfa Drug Management{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter (EN) + Cairo (AR) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ── Design Tokens ───────────────────────────────────────── */
+        :root {
+            --primary:       #667eea;
+            --primary-dark:  #5568d3;
+            --secondary:     #764ba2;
+            --accent:        #f093fb;
+            --success:       #11998e;
+            --danger:        #eb3349;
+            --warning:       #f7971e;
+            --sidebar-bg:    #1a1d2e;
+            --sidebar-text:  #a0aec0;
+            --sidebar-hover: #2d3148;
+            --sidebar-active:#667eea;
+            --navbar-h:      58px;
+            --sidebar-w:     260px;
+            --card-radius:   12px;
+            --input-radius:  8px;
+        }
+
+        /* ── Fonts ───────────────────────────────────────────────── */
+        body {
+            font-family: 'Inter', 'Cairo', 'Segoe UI', sans-serif;
+            background: #f0f2f8;
+            color: #2d3748;
+        }
+        :lang(ar), [dir="rtl"], .arabic-field {
+            font-family: 'Cairo', 'Inter', sans-serif;
+        }
+        .arabic-field {
+            text-align: right;
+        }
+        .arabic-field::placeholder { text-align: right; }
+
+        /* ── Navbar ─────────────────────────────────────────────── */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            height: var(--navbar-h);
+            box-shadow: 0 2px 20px rgba(102,126,234,0.3);
+            z-index: 1100;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.25rem;
+            letter-spacing: -0.3px;
+        }
+        .navbar-brand .brand-icon { font-size: 1.5rem; }
+
+        /* ── Sidebar ─────────────────────────────────────────────── */
+        .sidebar {
+            position: fixed;
+            top: var(--navbar-h);
+            left: 0;
+            width: var(--sidebar-w);
+            height: calc(100vh - var(--navbar-h));
+            background: var(--sidebar-bg);
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+            scrollbar-width: thin;
+            scrollbar-color: #3d4166 transparent;
+        }
+        html[dir="rtl"] .sidebar { left: auto; right: 0; }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: #3d4166; border-radius: 2px; }
+
+        /* Sidebar nav */
+        .sidebar-nav { list-style: none; padding: 12px 0; margin: 0; }
+        .sidebar-section-label {
+            padding: 16px 20px 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #4a5568;
+        }
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+        html[dir="rtl"] .sidebar-nav a {
+            border-left: none;
+            border-right: 3px solid transparent;
+        }
+        .sidebar-nav a:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+            border-left-color: var(--primary);
+        }
+        html[dir="rtl"] .sidebar-nav a:hover { border-right-color: var(--primary); }
+        .sidebar-nav a.active {
+            background: rgba(102,126,234,0.15);
+            color: #fff;
+            border-left-color: var(--primary);
+        }
+        html[dir="rtl"] .sidebar-nav a.active { border-right-color: var(--primary); }
+        .sidebar-nav a .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .sidebar-divider {
+            border: none;
+            border-top: 1px solid #2d3148;
+            margin: 8px 16px;
+        }
+
+        /* ── Main Content ────────────────────────────────────────── */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            padding: calc(var(--navbar-h) + 24px) 24px 40px;
+            min-height: 100vh;
+        }
+        html[dir="rtl"] .main-content {
+            margin-left: 0;
+            margin-right: var(--sidebar-w);
+        }
+
+        /* ── Cards ───────────────────────────────────────────────── */
+        .card {
+            border: none;
+            border-radius: var(--card-radius);
+            box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+            transition: box-shadow 0.2s;
+        }
+        .card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .card-header {
+            border-radius: var(--card-radius) var(--card-radius) 0 0 !important;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        /* ── Inputs ──────────────────────────────────────────────── */
+        .form-control, .form-select {
+            border-radius: var(--input-radius);
+            border: 1.5px solid #e2e8f0;
+            padding: 9px 13px;
+            font-size: 0.9rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #4a5568;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .label-ar {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 500;
+            font-size: 0.75rem;
+            color: #9b8eaf;
+            margin-right: 6px;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        .field-ar-indicator {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 0.6rem;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-right: 4px;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        /* ── Buttons ─────────────────────────────────────────────── */
+        .btn {
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 9px 18px;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            box-shadow: 0 2px 10px rgba(102,126,234,0.35);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #5a3580);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(102,126,234,0.45);
+        }
+        .btn-outline-primary { border-color: var(--primary); color: var(--primary); }
+        .btn-outline-primary:hover { background: var(--primary); }
+
+        /* ── Badges ──────────────────────────────────────────────── */
+        .badge { border-radius: 6px; font-weight: 600; padding: 4px 10px; }
+
+        /* ── Page Header ─────────────────────────────────────────── */
+        .page-header {
+            margin-bottom: 24px;
+        }
+        .page-header h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1a202c;
+            margin: 0;
+        }
+        .page-header .page-subtitle {
+            color: #718096;
+            font-size: 0.875rem;
+            margin-top: 3px;
+        }
+
+        /* ── Tabs ────────────────────────────────────────────────── */
+        .nav-tabs {
+            border-bottom: 2px solid #e2e8f0;
+            gap: 4px;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
+            color: #718096;
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 10px 16px;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+        .nav-tabs .nav-link:hover { color: var(--primary); }
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: transparent;
+        }
+        .nav-tabs .nav-link .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.65rem;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .nav-tabs .nav-link.tab-has-error { color: var(--danger) !important; }
+        .nav-tabs .nav-link.tab-has-error .tab-count { background: var(--danger); }
+
+        /* ── Formset inline ──────────────────────────────────────── */
+        .dosage-rule-item {
+            border: 1.5px solid #e2e8f0 !important;
+            border-radius: var(--card-radius) !important;
+            position: relative;
+            transition: border-color 0.2s;
+        }
+        .dosage-rule-item:hover { border-color: var(--primary) !important; }
+        .dosage-rule-item .rule-header {
+            background: linear-gradient(135deg, #f8f9ff, #f0f2ff);
+            padding: 12px 16px;
+            border-radius: calc(var(--card-radius) - 1.5px) calc(var(--card-radius) - 1.5px) 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .dosage-rule-item .rule-body { padding: 16px; }
+        .dosage-rule-item .rule-number {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+
+        /* ── Sticky save bar ─────────────────────────────────────── */
+        .sticky-save-bar {
+            position: sticky;
+            bottom: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid #e2e8f0;
+            padding: 12px 24px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 0 0 var(--card-radius) var(--card-radius);
+        }
+
+        /* ── Stats cards on dashboard ────────────────────────────── */
+        .stat-card {
+            border-radius: var(--card-radius);
+            padding: 20px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        .stat-card .stat-value { font-size: 2.2rem; font-weight: 700; line-height: 1; }
+        .stat-card .stat-label { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+        .stat-card .stat-icon  { font-size: 2rem; opacity: 0.3; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+
+        /* ── Alerts ──────────────────────────────────────────────── */
+        .alert { border-radius: var(--card-radius); border: none; font-size: 0.875rem; }
+
+        /* ── Table ───────────────────────────────────────────────── */
+        .table { border-collapse: separate; border-spacing: 0; }
+        .table thead th {
+            background: #f7f8fc;
+            border-bottom: 2px solid #e2e8f0;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #718096;
+            padding: 10px 14px;
+        }
+        .table tbody td { padding: 12px 14px; border-bottom: 1px solid #f0f2f5; vertical-align: middle; }
+        .table tbody tr:hover { background: #f8f9ff; }
+        .table tbody tr:last-child td { border-bottom: none; }
+
+        /* ── Responsive sidebar ──────────────────────────────────── */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform 0.3s; }
+            html[dir="rtl"] .sidebar { transform: translateX(100%); }
+            .sidebar.show { transform: translateX(0); }
+            .main-content { margin-left: 0 !important; margin-right: 0 !important; }
+        }
+
+        /* ── Misc ────────────────────────────────────────────────── */
+        .invalid-feedback { font-size: 0.8rem; }
+        .form-text { font-size: 0.78rem; color: #9b9eb5; }
+        .section-divider {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9b9eb5;
+            border-bottom: 1px solid #edf0f7;
+            padding-bottom: 6px;
+            margin: 20px 0 14px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- ── Navbar ─────────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container-fluid">
+            <button class="navbar-toggler border-0 me-2" type="button" id="sidebarToggle">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
+                <span class="brand-icon">💊</span>
+                <span>Wasfa <span class="fw-light opacity-75">Drug Management</span></span>
+            </a>
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <div class="btn-group btn-group-sm">
+                    <a href="{% change_language 'en' %}" class="btn btn-sm {% if LANGUAGE_CODE == 'en' %}btn-light{% else %}btn-outline-light{% endif %}">EN</a>
+                    <a href="{% change_language 'ar' %}" class="btn btn-sm {% if LANGUAGE_CODE == 'ar' %}btn-light{% else %}btn-outline-light{% endif %}">عربي</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Sidebar ────────────────────────────────────────────── -->
+    <div class="sidebar" id="sidebarMenu">
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{% url 'dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="bi bi-speedometer2 nav-icon"></i> {% trans "Dashboard" %}
+                </a>
+            </li>
+
+            <li><p class="sidebar-section-label">{% trans "Classification" %}</p></li>
+            <li>
+                <a href="{% url 'patient_group_list' %}" class="{% if 'patient_group' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-people nav-icon"></i> {% trans "Patient Groups" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'drug_category_list' %}" class="{% if 'drug_category' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-folder2-open nav-icon"></i> {% trans "Drug Categories" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'drug_family_list' %}" class="{% if 'drug_family' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-diagram-3 nav-icon"></i> {% trans "Drug Families" %}
+                </a>
+            </li>
+
+            <li><hr class="sidebar-divider"></li>
+            <li><p class="sidebar-section-label">{% trans "Drugs" %}</p></li>
+            <li>
+                <a href="{% url 'medication_list' %}" class="{% if 'medication' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-capsule nav-icon"></i> {% trans "Medications" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'dosage_rule_list' %}" class="{% if 'dosage_rule' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-calculator nav-icon"></i> {% trans "Dosage Rules" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'trade_name_list' %}" class="{% if 'trade_name' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-box-seam nav-icon"></i> {% trans "Trade Names" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'manufacturer_list' %}" class="{% if 'manufacturer' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-building nav-icon"></i> {% trans "Manufacturers" %}
+                </a>
+            </li>
+
+            <li><hr class="sidebar-divider"></li>
+            <li><p class="sidebar-section-label">{% trans "References" %}</p></li>
+            <li>
+                <a href="{% url 'equation_list' %}" class="{% if 'equation' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-percent nav-icon"></i> {% trans "Equations" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'age_weight_list' %}" class="{% if 'age_weight' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-graph-up nav-icon"></i> {% trans "Age-Weight" %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'drug_interaction_list' %}" class="{% if 'drug_interaction' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="bi bi-exclamation-triangle nav-icon"></i> {% trans "Interactions" %}
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- ── Main Content ───────────────────────────────────────── -->
+    <div class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        // Sidebar toggle on mobile
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+            document.getElementById('sidebarMenu').classList.toggle('show');
+        });
+
+        // Init Select2 globally
+        function initSelect2(scope) {
+            $(scope || document).find('.select2').each(function() {
+                if (!$(this).data('select2')) {
+                    $(this).select2({
+                        theme: 'bootstrap-5',
+                        width: '100%',
+                        allowClear: true,
+                        placeholder: $(this).find('option:first').text() || '— Select —',
+                    });
+                }
+            });
+        }
+        $(document).ready(function() { initSelect2(); });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

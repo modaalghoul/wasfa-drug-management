@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Dashboard" %} - Drug Management System{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1><i class="bi bi-speedometer2"></i> {% trans "Dashboard" %}</h1>
+            <p class="text-muted">{% trans "Welcome to the Drug Management System" %}</p>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="container-fluid mb-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div style="font-size: 2rem; color: #667eea;">
+                        <i class="bi bi-prescription2"></i>
+                    </div>
+                    <h3>{{ total_medications }}</h3>
+                    <p>{% trans "Generic Medications" %}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div style="font-size: 2rem; color: #198754;">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <h3>{{ total_products }}</h3>
+                    <p>{% trans "Trade Name Products" %}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div style="font-size: 2rem; color: #ffc107;">
+                        <i class="bi bi-folder"></i>
+                    </div>
+                    <h3>{{ total_categories }}</h3>
+                    <p>{% trans "Drug Categories" %}</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <div style="font-size: 2rem; color: #0dcaf0;">
+                        <i class="bi bi-function"></i>
+                    </div>
+                    <h3>{{ total_equations }}</h3>
+                    <p>{% trans "Medical Equations" %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="container-fluid mb-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">{% trans "Quick Actions" %}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">{% trans "Add New" %}</h6>
+                        <a href="{% url 'medication_create' %}" class="btn btn-sm btn-primary mb-2">
+                            <i class="bi bi-plus-circle"></i> {% trans "New Medication" %}
+                        </a>
+                        <a href="{% url 'trade_name_create' %}" class="btn btn-sm btn-primary mb-2">
+                            <i class="bi bi-plus-circle"></i> {% trans "New Trade Name" %}
+                        </a>
+                        <a href="{% url 'dosage_rule_create' %}" class="btn btn-sm btn-primary mb-2">
+                            <i class="bi bi-plus-circle"></i> {% trans "New Dosage Rule" %}
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">{% trans "Browse" %}</h6>
+                        <a href="{% url 'medication_list' %}" class="btn btn-sm btn-outline-primary mb-2">
+                            <i class="bi bi-list"></i> {% trans "All Medications" %}
+                        </a>
+                        <a href="{% url 'trade_name_list' %}" class="btn btn-sm btn-outline-primary mb-2">
+                            <i class="bi bi-list"></i> {% trans "All Trade Names" %}
+                        </a>
+                        <a href="{% url 'equation_list' %}" class="btn btn-sm btn-outline-primary mb-2">
+                            <i class="bi bi-list"></i> {% trans "All Equations" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Medications -->
+    <div class="container-fluid mb-4">
+        <div class="card">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{% trans "Recent Medications" %}</h5>
+                <a href="{% url 'medication_list' %}" class="btn btn-sm btn-outline-primary">{% trans "View All" %}</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_medications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{% trans "Name" %}</th>
+                                    <th>{% trans "Category" %}</th>
+                                    <th>{% trans "Form" %}</th>
+                                    <th>{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for med in latest_medications %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ med.generic_name_ar|default:med.generic_name }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if med.drug_category %}
+                                            <span class="badge bg-info">{{ med.drug_category.name_ar|default:med.drug_category.name }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if med.drug_form %}
+                                            <small>{{ med.get_drug_form_display }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'medication_detail' med.pk %}" class="btn btn-xs btn-info" title="{% trans 'View' %}">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'medication_edit' med.pk %}" class="btn btn-xs btn-warning" title="{% trans 'Edit' %}">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info m-3 mb-0">
+                        {% trans "No medications yet. Start by adding a new medication." %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Products -->
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{% trans "Recent Trade Name Products" %}</h5>
+                <a href="{% url 'trade_name_list' %}" class="btn btn-sm btn-outline-primary">{% trans "View All" %}</a>
+            </div>
+            <div class="card-body p-0">
+                {% if latest_products %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{% trans "Product Name" %}</th>
+                                    <th>{% trans "Manufacturer" %}</th>
+                                    <th>{% trans "Form" %}</th>
+                                    <th>{% trans "Availability" %}</th>
+                                    <th>{% trans "Actions" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prod in latest_products %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ prod.trade_name_ar|default:prod.trade_name }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if prod.manufacturer %}
+                                            {{ prod.manufacturer.name_ar|default:prod.manufacturer.name }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if prod.drug_form %}
+                                            <small>{{ prod.get_drug_form_display }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if prod.availability == 'good' %}success{% elif prod.availability == 'medium' %}warning{% else %}danger{% endif %}">
+                                            {{ prod.get_availability_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'trade_name_detail' prod.pk %}" class="btn btn-xs btn-info" title="{% trans 'View' %}">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'trade_name_edit' prod.pk %}" class="btn btn-xs btn-warning" title="{% trans 'Edit' %}">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info m-3 mb-0">
+                        {% trans "No trade name products yet. Start by adding a new product." %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

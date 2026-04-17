@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Patient Groups" %} — Wasfa{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1><i class="bi bi-people text-primary me-2"></i>{% trans "Patient Groups" %}</h1>
+    </div>
+    <a href="{% url 'patient_group_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>{% trans "Add New" %}
+    </a>
+</div>
+
+{% if patient_groups %}
+<div class="row g-3">
+    {% for pg in patient_groups %}
+    <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title fw-bold mb-0">{{ pg.name }}</h5>
+                {% if pg.name_ar %}
+                    <p class="mb-2" style="font-family:'Cairo',sans-serif; font-size:0.95rem; color:#764ba2;">{{ pg.name_ar }}</p>
+                {% endif %}
+                <p class="card-text text-muted small mt-1">
+                    {% if pg.description %}{{ pg.description|truncatewords:12 }}{% else %}<em>{% trans "No description" %}</em>{% endif %}
+                </p>
+                <div class="mt-2">
+                    {% if pg.requires_weight_input %}<span class="badge bg-info-subtle text-info me-1">⚖️ {% trans "Weight" %}</span>{% endif %}
+                    {% if pg.requires_age_input %}<span class="badge bg-success-subtle text-success">🎂 {% trans "Age" %}</span>{% endif %}
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0 pb-3 px-3">
+                <a href="{% url 'patient_group_edit' pg.pk %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i> {% trans "Edit" %}</a>
+                <a href="{% url 'patient_group_delete' pg.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div class="alert alert-info">{% trans "No patient groups yet." %} <a href="{% url 'patient_group_create' %}">{% trans "Add one now" %}</a>.</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Dosage Rules" %} - Drug Management System{% endblock %}
+{% block content %}
+<div class="container-fluid"><div class="page-header"><div class="container-fluid d-flex justify-content-between align-items-center"><div><h1><i class="bi bi-calculator"></i> {% trans "Dosage Rules" %}</h1></div><a href="{% url 'dosage_rule_create' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> {% trans "Add New" %}</a></div></div>
+<div class="container-fluid">{% if rules %}<div class="card"><div class="card-body p-0"><div class="table-responsive"><table class="table table-hover mb-0"><thead class="table-light"><tr><th>{% trans "Medication" %}</th><th>{% trans "Label" %}</th><th>{% trans "Route" %}</th><th>{% trans "Actions" %}</th></tr></thead><tbody>{% for rule in rules %}<tr><td><strong>{{ rule.generic_medication.generic_name_ar|default:rule.generic_medication.generic_name }}</strong></td><td>{{ rule.label }}</td><td>{{ rule.get_route_display }}</td><td><a href="{% url 'dosage_rule_edit' rule.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a><a href="{% url 'dosage_rule_delete' rule.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a></td></tr>{% endfor %}</tbody></table></div></div></div>{% else %}<div class="alert alert-info">{% trans "No rules yet." %}</div>{% endif %}</div></div>
+{% endblock %}

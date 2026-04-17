@@ -1,0 +1,120 @@
+# Arabic translations for Drug Management System
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+"Language-Team: Arabic\n"
+
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+msgid "Welcome to the Drug Management System"
+msgstr "مرحبا بك في نظام إدارة الأدوية"
+
+msgid "Generic Medications"
+msgstr "الأدوية الجنيسة"
+
+msgid "Trade Name Products"
+msgstr "منتجات الأسماء التجارية"
+
+msgid "Drug Categories"
+msgstr "فئات الأدوية"
+
+msgid "Medical Equations"
+msgstr "المعادلات الطبية"
+
+msgid "Quick Actions"
+msgstr "الإجراءات السريعة"
+
+msgid "Add New"
+msgstr "إضافة جديد"
+
+msgid "New Medication"
+msgstr "دواء جديد"
+
+msgid "New Trade Name"
+msgstr "اسم تجاري جديد"
+
+msgid "New Dosage Rule"
+msgstr "قاعدة جرعة جديدة"
+
+msgid "Browse"
+msgstr "استعراض"
+
+msgid "All Medications"
+msgstr "جميع الأدوية"
+
+msgid "All Trade Names"
+msgstr "جميع الأسماء التجارية"
+
+msgid "All Equations"
+msgstr "جميع المعادلات"
+
+msgid "Recent Medications"
+msgstr "الأدوية الأخيرة"
+
+msgid "View All"
+msgstr "عرض الكل"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Category"
+msgstr "الفئة"
+
+msgid "Form"
+msgstr "الشكل"
+
+msgid "Actions"
+msgstr "الإجراءات"
+
+msgid "View"
+msgstr "عرض"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "No medications yet. Start by adding a new medication."
+msgstr "لا توجد أدوية حتى الآن. ابدأ بإضافة دواء جديد."
+
+msgid "Recent Trade Name Products"
+msgstr "منتجات الأسماء التجارية الأخيرة"
+
+msgid "Product Name"
+msgstr "اسم المنتج"
+
+msgid "Manufacturer"
+msgstr "الشركة المصنعة"
+
+msgid "Availability"
+msgstr "التوفر"
+
+msgid "No trade name products yet. Start by adding a new product."
+msgstr "لا توجد منتجات أسماء تجارية حتى الآن. ابدأ بإضافة منتج جديد."
+
+msgid "Patient Groups"
+msgstr "مجموعات المرضى"
+
+msgid "Drug Families"
+msgstr "عائلات الأدوية"
+
+msgid "Dosage Rules"
+msgstr "قواعد الجرعات"
+
+msgid "Trade Names"
+msgstr "الأسماء التجارية"
+
+msgid "Manufacturers"
+msgstr "الشركات المصنعة"
+
+msgid "Equations"
+msgstr "المعادلات"
+
+msgid "Age-Weight"
+msgstr "العمر والوزن"
+
+msgid "Interactions"
+msgstr "التفاعلات"
+
+msgid "Drug Management"
+msgstr "إدارة الأدوية"

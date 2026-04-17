@@ -1,0 +1,23 @@
+# ── Core ──────────────────────────────────────────────────────
+Django==6.0.4
+asgiref==3.11.1
+sqlparse==0.5.5
+tzdata==2026.1
+
+# ── Django add-ons ────────────────────────────────────────────
+django-jazzmin==3.0.4
+django-crispy-forms==2.6
+crispy-bootstrap5==2026.3
+Pillow==12.2.0
+polib==1.2.0
+
+# ── Production server & static files ─────────────────────────
+gunicorn==23.0.0
+whitenoise==6.9.0
+
+# ── PostgreSQL (Render uses Postgres) ────────────────────────
+psycopg2-binary==2.9.10
+dj-database-url==2.3.0
+
+# ── Environment variables ─────────────────────────────────────
+python-decouple==3.8

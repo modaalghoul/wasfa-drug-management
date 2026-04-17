@@ -1,0 +1,31 @@
+# ─────────────────────────────────────────────────────────────
+# render.yaml — Render Infrastructure-as-Code
+# Commit this file and Render auto-configures your service.
+# ─────────────────────────────────────────────────────────────
+
+services:
+  - type: web
+    name: wasfa-drug-management
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
+    plan: free                  # change to "starter" for always-on
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings
+      - key: SECRET_KEY
+        generateValue: true     # Render auto-generates a secure key
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: wasfa-db
+          property: connectionString
+
+databases:
+  - name: wasfa-db
+    plan: free                  # Render free Postgres (expires after 90 days)
+    databaseName: wasfa
+    user: wasfa_user

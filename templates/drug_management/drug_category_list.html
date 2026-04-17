@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Drug Categories" %} — Wasfa{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+        <h1><i class="bi bi-folder2-open text-primary me-2"></i>{% trans "Drug Categories" %}</h1>
+    </div>
+    <a href="{% url 'drug_category_create' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>{% trans "Add New" %}
+    </a>
+</div>
+
+{% if categories %}
+<div class="row g-3">
+    {% for cat in categories %}
+    <div class="col-lg-3 col-md-4 col-sm-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div style="font-size:2.2rem; margin-bottom:10px;">
+                    {% if cat.icon %}{{ cat.icon }}{% else %}<i class="bi bi-folder"></i>{% endif %}
+                </div>
+                <h5 class="card-title fw-bold mb-0">{{ cat.name }}</h5>
+                {% if cat.name_ar %}
+                    <p class="mb-1" style="font-family:'Cairo',sans-serif; font-size:0.95rem; color:#764ba2;">{{ cat.name_ar }}</p>
+                {% endif %}
+                <p class="card-text text-muted small mt-2 mb-0">
+                    {% if cat.description %}{{ cat.description|truncatewords:12 }}{% else %}<em>{% trans "No description" %}</em>{% endif %}
+                </p>
+                {% if cat.family_count %}
+                    <span class="badge bg-primary-subtle text-primary mt-2">{{ cat.family_count }} {% trans "families" %}</span>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent border-top-0 pb-3 px-3">
+                <a href="{% url 'drug_category_edit' cat.pk %}" class="btn btn-sm btn-warning me-1"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'drug_category_delete' cat.pk %}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+    <div class="alert alert-info">{% trans "No categories yet." %} <a href="{% url 'drug_category_create' %}">{% trans "Add one now" %}</a>.</div>
+{% endif %}
+{% endblock %}
