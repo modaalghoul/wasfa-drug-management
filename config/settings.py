@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ── Security ──────────────────────────────────────────────────
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG      = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com', cast=Csv())
 
 # ── Application definition ────────────────────────────────────
 INSTALLED_APPS = [
@@ -104,7 +104,8 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 # ── Static & Media files ──────────────────────────────────────
 STATIC_URL  = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+_STATIC_DIR = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [_STATIC_DIR] if os.path.isdir(_STATIC_DIR) else []
 
 # WhiteNoise compression + caching for production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
