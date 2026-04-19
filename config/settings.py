@@ -13,7 +13,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ── Security ──────────────────────────────────────────────────
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-production')
 DEBUG      = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.onrender.com', cast=Csv())
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=Csv())
+# Render automatically sets RENDER_EXTERNAL_HOSTNAME to the service's public hostname.
+# Append it directly so it's always allowed, regardless of the ALLOWED_HOSTS env var.
+_RENDER_HOST = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if _RENDER_HOST and _RENDER_HOST not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(_RENDER_HOST)
 
 # ── Application definition ────────────────────────────────────
 INSTALLED_APPS = [
